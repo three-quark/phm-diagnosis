@@ -1,11 +1,13 @@
 import setuptools
 
-with open("README-zh.md", "r") as fh:
+import os
+print(os.path.curdir)
+with open('README.md', "r") as fh:
   long_description = fh.read()
 
 setuptools.setup(
   name="phm_diagnosis",
-  version="0.0.1",
+  version="1.0.4",
   author="qin_hai_ning",
   author_email="2364839934@qq.com",
   description="failure diagnosis",
@@ -15,7 +17,7 @@ setuptools.setup(
   packages=setuptools.find_packages(),
   classifiers=[
   "Programming Language :: Python :: 3",
-  "License :: OSI Approved :: Apache License 2.0",
+  "License :: OSI Approved :: Apache Software License",
   "Operating System :: OS Independent",
   ],
 )

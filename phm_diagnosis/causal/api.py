@@ -17,7 +17,7 @@ from ylearn.causal_model.graph import CausalGraph
 from ylearn.causal_discovery import CausalDiscovery
 
 #__version__ = '0.0.5'
-__license__ = 'Apache License 2.0'
+__license__ = 'License :: OSI Approved :: Apache Software License'
 __name__ = 'phm_diagnosis.api'
 
 def _why_builder(train_data, outcome, *, treatment=None, **kwargs):
