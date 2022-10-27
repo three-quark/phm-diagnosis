@@ -20,28 +20,25 @@ ylearn主要依托，华为诺亚的gCastle推理包，torch，networkx完成以
 
 
 #### 软件架构
+
 软件架构说明
+
 ```
-.
-├── build
-│   ├── bdist.linux-x86_64
-│   └── lib
-│       └── phm_feature
-│           └── __init__.py
-├── dist
-│   ├── phm_feature-0.0.2-py3-none-any.whl
-│   └── phm_feature-0.0.2.tar.gz
-├── LICENSE
-├── phm_feature
-│   ├── __init__.py
-├── phm_feature.egg-info
-│   ├── dependency_links.txt
-│   ├── PKG-INFO
-│   ├── SOURCES.txt
-│   └── top_level.txt
-├── README.md
-├── setup.py
-└── test.py
+
+|─ phm_diagnosis
+   ├── causal
+   │   ├── api.py
+   │   ├── __init__.py
+   ├── __init__.py
+   ├── phm_dataio
+   │   ├── __init__.py
+   │   ├── base.py
+   │   ├── hbase_client.py
+   │   ├── redis_client.py
+   │   └── utils.py
+   ├── phm_feature
+       ├── __init__.py
+
 ```
 
 #### 安装教程

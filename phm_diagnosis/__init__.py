@@ -5,6 +5,7 @@ from .causal import causal_model_build
 from .causal import plot_causal_graph
 from .causal import causal_discovery
 
+'''
 from .phm_feature import enable_parallel
 from .phm_feature import disable_parallel
 from .phm_feature import feature_t
@@ -16,3 +17,4 @@ from .phm_feature import cepstrum
 from .phm_feature import envelope
 from .phm_feature import window
 from .phm_feature import divide
+'''
