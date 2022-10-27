@@ -10,6 +10,10 @@ import redis
 from datetime import datetime
 from .base import DBInterface
 from .utils import count_time
+
+'''
+the redis client
+'''
  
 class RedisClient(DBInterface):
 

@@ -1,2 +1,2 @@
 #!/bin/bash
-cd .. && python test/test_case.py -v 
+cd .. && python ./test/test_case.py -v 

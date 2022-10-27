@@ -3,7 +3,7 @@
 '''
 import sys
 import os
-sys.path.append(os.curdir)
+import phm_diagnosis
 from phm_diagnosis import why_builder
 from phm_diagnosis import get_cause_graph_from_why
 from phm_diagnosis import causal_model_build

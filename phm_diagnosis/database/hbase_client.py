@@ -13,6 +13,10 @@ from .base import DBInterface
 
 p = pdb.set_trace
 
+'''
+the hbase client 
+'''
+
 def timeFilter(startTime, endTime, time_columnName):
     return f"SingleColumnValueFilter('data','{time_columnName}',>=,'binary:" + startTime + \
         f"') AND SingleColumnValueFilter('data','{time_columnName}',<=,'binary:" + endTime + "')"

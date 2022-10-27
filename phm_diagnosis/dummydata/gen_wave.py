@@ -3,6 +3,10 @@ import matplotlib.pyplot as plt
 import pdb
 
 '''
+generate dummy data for algorithm test
+'''
+
+'''
 contribute a wave with five elements
 :param a: amplitude
 :param f: freq
