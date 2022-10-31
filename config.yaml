@@ -1,0 +1,50 @@
+# -*- coding: UTF-8 -*-
+#log:
+#  log_level: "FATAL"   # 日志等级
+
+#environment_variables:
+#  PYSPARK_PYTHON: "/usr/local/python3/python"
+#  PYSPARK_DRIVER_PYTHON: "/usr/local/python3/python"
+#  PYSPARK_PIN_THREAD: "true"
+#  dependence_zip_path: "file:///opt/code/pyspark/phm_interpretation_rule_depends.zip"  # 依赖包的路径
+
+#spark_running_parameters:
+#  master: "local[*]"   # 任务运行模式，默认为本地运行
+#  spark_cores_max: "8"  # 总核数
+#  spark_executor_memory: "4g"  # 执行器内存
+#  spark_executor_cores: "4"  # 执行器核数
+#  spark_driver_memory: "3g"  # 驱动器内存
+#  spark_driver_cores: "4"  # 驱动器核数
+#  spark_sql_shuffle_partitions: "1"
+#  partition_number: "1"
+
+resource:
+  log_path: "/home/phm/python/log/"          # 日志保存地址
+  thread:
+    definedThreadNum: !!int 4  # 自定义的线程数
+  hdfs:
+    hdfsAddress: "http://master:9870"
+  hbase:
+    hbase_master_host: "master"
+    read_columnFamilyName: "data"  # hbase参数表的列族名
+    time_columnName: "time"        # hbase中存储时间的列名
+  rabbit:
+    rabbitmqHost: "192.168.0.3"           # rabbitmq地址
+    rabbitmqPort: !!int 5672       # rabbitmq端口号
+    rabbitmqUserName: "root"       # rabbitmq用户名
+    rabbitmqPassword: "root"       # rabbitmq密码
+    exchangeType: "topic"          # 交换机类型
+    queueName_verify_main: "faultTreeVerifyMain"  # 主线程队列名称
+    exchangeName_verify_main: "modeling.treeMain"  # 主线程交换机名称
+    queueName_verify_thread: "faultTreeVerifyThread"  # 子线程队列名称
+    exchangeName_verify_thread: "modeling.treeThread"  # 子线程交换机名称
+    queueName_release: "faultTreeVerifyRelease"       # 故障树发布队列名称
+    exchangeName_release: "modeling.treeRelease"      # 故障树发布交换机名称
+
+#    queueName_verify: "analysisRuleVerify"        # 规则验证队列名
+#    exchangeName_verify: "modeling.ruleVerify"    # 规则验证交换机名称
+#    queueName_release: "analysisRuleRelease"      # 规则发布队列名
+#    exchangeName_release: "modeling.ruleRelease"  # 规则发布交换机名称
+
+
+
