@@ -12,9 +12,11 @@ from datetime import datetime
 p = pdb.set_trace
 
 '''
-formular the code with code, but not with doc
-interface of db client, puporse for make the code formuler, but it's hard to define the function to match all time and status
+interface of db client
+formular the database client class with interface class
+puporse for make the code formuler, but it's hard to define the function to match all time and status
 '''
+
 
 class DBInterface(metaclass=ABCMeta):
 
@@ -35,5 +37,3 @@ class DBInterface(metaclass=ABCMeta):
     @abstractmethod
     def read(self, **keargs):
         raise NotImplementedError
-
-

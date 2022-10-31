@@ -1,112 +1,63 @@
-#!
-from abc import ABCMeta, abstractmethod
+# -*- coding: UTF-8 -*-
 import re
 import happybase
 import pandas as pd
-import traceback
-import pdb
-import time
-from functools import wraps
-from datetime import datetime
-from .utils import count_time
 from .base import DBInterface
 
-p = pdb.set_trace
 
-'''
-the hbase client 
-'''
+def time_filter(startTime, endTime, time_column):
+    build_timeFilter = f"SingleColumnValueFilter('data','{time_column}',>=,'binary:" + startTime + \
+        f"') AND SingleColumnValueFilter('data','{time_column}',<=,'binary:" + \
+        endTime + "')"
+    return build_timeFilter
 
-def timeFilter(startTime, endTime, time_columnName):
-    return f"SingleColumnValueFilter('data','{time_columnName}',>=,'binary:" + startTime + \
-        f"') AND SingleColumnValueFilter('data','{time_columnName}',<=,'binary:" + endTime + "')"
 
-class HBaseClient(DBInterface):
+class HbaseClient(DBInterface):
 
-    def __init__(self, _id, name, size, host, port=9000, **kwargs):
-        self._id = _id
-        self.name = name
-        self.connect_pool(size, host, port, **kwargs)
+    def __init__(self, size, host, port):
+        self.pool = happybase.ConnectionPool(size=size, host=host, port=port)
 
-    def connect_pool(self, numThread, host, port=9000, **kwargs):
-        self.pool = happybase.ConnectionPool(
-            size=numThread + 1, host=host, port=9090)
-
-    #def connect(self):
-    #    self.pool.connection()
-
-    #def disconnect(self):
-    #    self.pool.close()
-
-    #def exec(self, **kwargs):
-    #    pass
-
-    def build_data_struct(self, read_columnFamilyName, time_columnName, paramNameList):
-        # data struct [cols_cluster_name: cols_name, cols_cluster_name: cols_name]
-        paramNameList = ["row_key", time_columnName] + paramNameList
-        hbaseReadParamList = paramNameList[1:]
-        hbaseReadParamList.sort()
+    def read(self, table, columns, startTime, endTime, column_family, time_column):
+        '''read data from hbase, with time columns to filter it
+        '''
+        paramNameList = ["row_key", time_column] + columns
+        #print(paramNameList)
+        hbaseReadParamList = paramNameList[1:]  # remove key list
+        #print(hbaseReadParamList)
         choose_columns = []
+        hbaseReadParamList.sort()
         for param in hbaseReadParamList:
-            choose_columns.append(read_columnFamilyName + ":" + param)
-        return choose_columns
+            choose_columns.append(column_family + ":" + param)
 
-    @count_time
-    def read(
-        self,
-        read_hbase_table,
-        read_columnFamilyName,
-        time_columnName,
-        paramNameList,
-        startTime,
-        endTime,
-    ):
+
+        paramData = []
         with self.pool.connection() as hbase_connection:
-            try:
-                choose_columns = self.build_data_struct(read_columnFamilyName, time_columnName, paramNameList)
-                # conn to table
-                read_table = hbase_connection.table(read_hbase_table)
- 
-                # specify the target columns and filter data by time
-                m_time_filter = timeFilter(startTime, endTime, time_columnName)
-                #print(choose_columns)
-                #print(m_time_filter)
-                table_data = read_table.scan(
-                    columns=choose_columns, filter=m_time_filter)
- 
-                paramData = []
-                for dataKey, dataDict in table_data:
-                    # 每一行的时间
-                    datetime_row = dataDict[(
-                        read_columnFamilyName + ":" + time_columnName).encode("utf-8")].decode("utf-8")
-                    m = len(
-                        re.findall(
-                            r"\A[1-9]\d/\d+/\d+\s+\d+:\d+:\d+",
-                            datetime_row))
- 
-                    dictKeyList = dataDict.keys()
-                    if len(dictKeyList) != len(choose_columns):
-                        for content in choose_columns:
-                            if content.encode("utf-8") not in dictKeyList:
-                                dataDict[content.encode("utf-8")] = "DUMMY".encode("utf-8")
-                    dataDict = {k: v for k, v in sorted(dataDict.items())}
-                    #print(dataDict)
-                    paramList = list(dataDict.values())
-                    #print(paramList)
-                    paramData.append([x.decode('utf-8') for x in paramList])
-                #print(paramData)
-                if len(paramData) == 0:
-                    df = self.arr2df(paramData, [])
-                    hbase_connection.close()
-                    return df
+            read_table = hbase_connection.table(table)
+            timeFilter = time_filter(startTime, endTime, time_column)
+            table_data = read_table.scan(
+                columns=choose_columns, filter=timeFilter)
+            # table_data = read_table.scan(columns=choose_columns)
 
-                df = self.arr2df(paramData, choose_columns)
-                hbase_connection.close()
-                return df
-            except AssertionError as e:
-                traceback.print_exc()
+            for dataKey, dataDict in table_data:
+                datetime_row = dataDict[(
+                    column_family + ":" + time_column).encode("utf-8")].decode("utf-8")
+                # time format 21/7/29 9:42:44
+                m = len(re.findall(
+                    r"\A[1-9]\d/\d+/\d+\s+\d+:\d+:\d+", datetime_row))
+                dictKeyList = dataDict.keys()
+                ''' fill the null cell with 'DUMMY' instead
+                '''
+                if len(dictKeyList) != len(choose_columns):
+                    for col in choose_columns:
+                        if col.encode("utf-8") not in dictKeyList:
+                            dataDict[col.encode(
+                                "utf-8")] = "DUMMY".encode("utf-8")
+                dataDict = {k: v for k, v in sorted(dataDict.items())}
+                paramList = list(dataDict.values())
+                paramData.append([x.decode('utf-8') for x in paramList])
 
-    def arr2df(self, paramData, dfParamList):
+            hbase_connection.close()
+        dfParamList = hbaseReadParamList.copy()
         df = pd.DataFrame(data=paramData, columns=dfParamList)
-        #df.fillna(0)          # 将缺失值以0填充
+        df.fillna(0.0)
         return df

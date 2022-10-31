@@ -17,6 +17,7 @@ p = pdb.set_trace
 json.dumps(arr, cls=NpEncoder)
 '''
 
+
 class NpEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, np.integer):
@@ -27,6 +28,7 @@ class NpEncoder(json.JSONEncoder):
             return obj.tolist()
         else:
             return super(NpEncoder, self).default(obj)
+
 
 def count_time(func):
     """
